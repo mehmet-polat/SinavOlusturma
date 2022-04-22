@@ -1,0 +1,58 @@
+﻿@using System.Threading.Tasks
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@model SinavOlusturma.Models.ViewModels.LoginViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    /*#form{min-height:calc(100% - 435px);margin:0 !important}
+
+        #form .container
+        { height: 54vh;}*/
+
+</style>
+
+
+<div class="text-center mt-5">
+    <form action="/Login/Login" id="UyeGirisForm" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-4 offset-4">
+                <div class="form-group mb-2">
+                    <input type="text" placeholder="Kullanıcı Adı" name="UserName" id="Email" class="form-control">
+                    <span asp-validation-for="UserName"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <input type="password" name="Password" id="Parola" placeholder="Password" class="form-control">
+                    <span asp-validation-for="Password"></span>
+                </div>
+
+                <div class="form-group mb-2">
+
+                    <button type="submit" id="OturumAcBtn" class="btn btn-primary btn-block">Oturum Aç</button>
+                </div>
+            </div>
+            <div class="col-12">
+                @if (TempData["Result"] != null)
+                {
+                    var Rslt = TempData["Result"].ToString();
+
+
+                    <div class="row">
+                        <div class="col-md-6 offset-3">
+                            <div class="alert alert-danger" role="alert">
+                                @Rslt
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </form>
+
+</div>
+

@@ -1,0 +1,160 @@
+﻿@using System.Data.SQLite
+@using System.Data
+@using SinavOlusturma.Models
+@using Json.Net
+@using System.ServiceModel.Syndication
+@using System.Xml
+@using SinavOlusturma.Models.Entity
+@model SinavOlusturma.Models.ViewModels.ExamViewModel
+
+
+@{
+    var PostList = TempData["PostList"] != null ? (List<SyndicationItem>)TempData["PostList"] : null;
+}
+
+
+<div class="row">
+    <div class="col-12">
+
+
+        <div class="row">
+            <div class="col-md-6 offset-3 border border-dark border-2 pt-2 pb-2">
+                <form action="/Exam/Create" class="" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label class="control-label">Yazı</label>
+                        <select class="form-control" id="PostsSelect" asp-for="WiredId" onchange="YaziDegisti()">
+                            <option value="0">Bir yazı seçin!</option>
+                            @{
+                                if (PostList != null)
+                                {
+                                    foreach (var item in PostList)
+                                    {
+                                        <option value="@item.Id">@item.Title.Text</option>
+                                    }
+                                }
+
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group d-none" id="PostSummaryArea">
+                        <div class="form-group">
+
+                            <label asp-for="Description" class="control-label"></label>
+                            <textarea asp-for="Description" id="PostSummary" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <input type="hidden" asp-for="Title" id="PostTitle" class="form-control" />
+                        </div>
+                        @{
+
+                            for (var i = 0; i < Model.ExamQuestions.Count; i++)
+                            {
+                                var item = Model.ExamQuestions[i];
+                                item.Question =  "Soru dasdas dsadasdasdasdsad";
+                                <div class="form-group">
+                                    
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group mb-1">
+                                                <label asp-for="@item.Question" class="control-label">Soru @item.OrderNo</label>
+                                                    <input type="text" asp-for="@Model.ExamQuestions[i].Question" class="form-control" />
+                                                    <input type="hidden" asp-for="@Model.ExamQuestions[i].OrderNo" class="form-control" />
+                                            </div>
+                                        </div>
+                                        @{
+
+                                            for (var iq = 0; iq < item.QuestionsOptions.Count; iq++)
+                                            {
+                                                var q = item.QuestionsOptions[iq];
+                                                q.Description =  "Şık ıowquoıwrerkfcklas dasdjasdeujoıajde lkadlaskjdhkl";
+                                                <div class="col-6">
+                                                  
+                                                    <div class="input-group mb-1">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text">@q.OptionName )</div>
+                                                        </div>
+                                                        <input type="text" asp-for="@Model.ExamQuestions[i].QuestionsOptions[iq].Description" class="form-control" />
+                                                        <input type="hidden" asp-for="@Model.ExamQuestions[i].QuestionsOptions[iq].OptionName"/>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        <div class="col-12">
+                                            <select class="form-select" asp-for="@Model.ExamQuestions[i].CorrectOption" aria-label="Default select example">
+                                                <option selected>Doğru Cevabı Seç</option>
+                                                @{
+                                                    foreach (var q in item.QuestionsOptions)
+                                                    {
+                                                        <option value="@q.OptionName">(@q.OptionName) Şıkkı</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                        <hr class="mt-2" />
+
+                                    </div>
+
+
+                                </div>
+                            }
+                        }
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-4 offset-4">
+                                    <div class="d-grid gap-2 pt-3">
+                                        <input type="submit" value="Sınav Oluştur" class="btn btn-primary btn-block" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+@section Scripts {
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+<script>
+    function YaziDegisti(){
+        var WiredId = $("#PostsSelect").val();
+
+        if(WiredId && WiredId!= "0"){
+                 $.ajax({
+              method: "POST",
+              url: "/Exam/GetWiredPos",
+              data: { WiredId:WiredId }
+            }).done(function( Post ) {
+            if(Post && Post.summary && Post.summary.text){
+                $("#PostSummary,#PostTitle").val(Post.summary.text);
+                $("#PostTitle").val(Post.title.text);
+                $("#PostSummaryArea").removeClass("d-none");
+            }
+            else        {
+                 $("#PostSummary,#PostTitle").val("");
+                $("#PostSummaryArea").addClass("d-none");
+            }
+
+              });
+        }
+        else{
+            $("#PostSummary,#PostTitle").val("");
+                $("#PostSummaryArea").addClass("d-none");
+
+        }
+
+    }
+</script>
+}

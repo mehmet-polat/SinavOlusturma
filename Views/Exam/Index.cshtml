@@ -1,0 +1,56 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@using SinavOlusturma.Models.Entity
+@model List<Exam>
+
+<div class="row">
+    <div class="col-md-8 offset-2 border border-dark border-2 pt-2 pb-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Başlık</th>
+                    <th scope="col">Tarih</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var item in Model)
+                    {
+                        <tr  role="button">
+                            <th scope="row" onclick="SinavGetir(@item.Id)">@item.Id</th>
+                            <td onclick="SinavGetir(@item.Id)">@item.Title</td>
+                            <td onclick="SinavGetir(@item.Id)">@item.Date</td>
+                            <td><button type="button" class="btn btn-danger btn-sm SilBtn" onclick="SinavSil(@item.Id)">Sil</button></td>
+                        </tr>
+                    }
+                }              
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+
+<script>
+    function SinavSil(ExamId){
+        
+        if(confirm("Sınavı Silmek İstediğinizden Emin misini?")){
+              $.ajax({
+              method: "POST",
+              url: "/Exam/DeleteExam",
+              data: { ExamId:ExamId }
+            }).done(function( Result ) {
+                window.location.reload();
+              });
+        }       
+    }
+    function    SinavGetir(ExamId){
+        window.location.href="/Exam/"+ExamId;
+    }
+</script>
+}

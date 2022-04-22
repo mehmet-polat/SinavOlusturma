@@ -1,0 +1,39 @@
+﻿@using SinavOlusturma.Models.ViewModels
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ExamQuestionViewModel
+@{
+
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-group mb-1">
+            <label asp-for="Question" class="control-label">Soru @Model.OrderNo</label>
+            <input type="text" asp-for="Question" class="form-control" />
+        </div>
+
+    </div>
+    @{
+        foreach (var item in Model.QuestionsOptions.ToList())
+        {
+            <div class="col-6">
+                @await Component.InvokeAsync("QuestionOption",new {OptionName=item.OptionName})
+            </div>
+        }
+    }
+    <div class="col-12">
+        <select class="form-select" aria-label="Default select example">
+            <option selected>Doğru Cevabı Seç</option>
+            @{
+                foreach (var item in Model.QuestionsOptions)
+                {
+                    <option value="@item.OptionName">(@item.OptionName) Şıkkı</option>        
+                }
+            }
+        </select>
+    </div>
+    <hr class="mt-2" />
+
+</div>

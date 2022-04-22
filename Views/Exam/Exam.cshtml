@@ -1,0 +1,94 @@
+﻿@using Newtonsoft.Json
+@using SinavOlusturma.Models.ViewModels
+@model ExamViewModel
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="text-center">
+            <h1 class="display-4">@Model.Title</h1>
+            <p class="lead">@Model.Description</p>
+
+
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @{
+        foreach (var question in Model.ExamQuestions)
+        {
+            <div class="col-6" id="Question-@question.Id">
+                <h4><strong>@question.OrderNo )</strong> @question.Question</h4>
+                @{
+                    foreach (var option in question.QuestionsOptions)
+                    {
+                        <p class="border border-dark p-2 Option" id="Option-@question.Id-@option.Id" onclick="OptionSelect(@question.Id, @option.Id,'@option.OptionName')" role="button"><strong>@option.OptionName )</strong> @option.Description</p>
+                    }
+                }
+            </div>
+        }
+    }
+
+
+
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-grid gap-2 pt-3">
+            <button type="button" class="btn btn-primary btn-block" onclick="SinavDone(@Model.Id)">Sınavı Tamamla</button>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+<script>
+
+    var SelectedOptions=[];
+    function OptionSelect(QuestionId, OptionId,OptionName){
+
+        let Cnt = SelectedOptions.findIndex(x=>x.ExamQuestionId==QuestionId);
+        if(Cnt>-1){
+            SelectedOptions.splice(Cnt,1);
+        }
+
+        SelectedOptions.push({ExamQuestionId:QuestionId,Id:OptionId,OptionName:OptionName});
+
+        $("#Question-"+QuestionId+" .Option").removeClass("bg-secondary");
+
+        $("#Option-"+QuestionId+"-" +OptionId).addClass("bg-secondary")
+
+    }
+    function SinavDone(ExamId){
+
+        if(confirm("Sınavı Bitirmek İstediğinizden Emin misini?")){
+              $.ajax({
+              method: "POST",
+              url: "/Exam/ControlExam",
+              data: { ExamId:ExamId,SelectedOptions:SelectedOptions }
+            }).done(function( Result ) {
+
+
+                 $(".Option").removeClass("bg-secondary").removeClass("bg-success");
+
+                for (var i=0 ; i < Result.selectedOptions.length; i++){
+                    var o =  Result.selectedOptions[i];
+
+
+                 if(o.correctResponse){
+                             $("#Option-"+o.examQuestionId+"-" +o.id).removeClass("bg-secondary").addClass("bg-success");
+
+                 }
+                 else{
+                       $("#Option-"+o.examQuestionId+"-" +o.id).removeClass("bg-secondary").addClass("bg-danger");
+                 }
+                }
+              });
+        }
+    }
+
+</script>
+}
